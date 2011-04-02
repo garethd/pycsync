@@ -1,0 +1,28 @@
+pycsync
+https://github.com/garethd/pycsync
+
+
+A simple python picasaweb to hard drive picture downloader.
+Also does resizing to help limit disk usage. 
+This is pretty nifty with slideshow type screensavers. 
+
+
+Depends on Python and Google's data protocol Python API (Gdata).
+
+Python:
+| version | tested
+--------------------------
+| 2.5     | no
+| 2.6     | yes
+| 2.7     | no
+| 3.x     | no
+--------------------------
+
+Untested versions along 2.x should work anyway.
+
+Gdata:
+http://code.google.com/apis/gdata
+http://code.google.com/p/gdata-python-client
+
+Tested using gdata-python-client version 2.0.14.
+
