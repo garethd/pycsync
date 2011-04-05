@@ -28,7 +28,6 @@ TODO: DB indexing
 * store comments to display on the saver
 
 TODO: Other feeds
-* People you follow, friends etc
 Commonlise the GetFeatured one! - how to resize them!!!???
 
 '''
@@ -142,7 +141,8 @@ def GetAlbumDir(album, prefix):
     return album_dir.replace(' ', '_')
 
 
-def sync_album(album, prefix, imgmax):
+def sync_album(album, prefix, imgmax, limit=None):
+    #TODO: add limit in here
     """
     download the album photos to the dir under prefix
     @param album: the gdata album object
