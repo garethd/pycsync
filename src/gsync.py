@@ -33,7 +33,6 @@ Commonlise the GetFeatured one! - how to resize them!!!???
 
 '''
 
-
 from threading import Thread
 import gdata.geo
 import gdata.media
@@ -43,11 +42,14 @@ import socket
 import urllib2
 
 
-# FIXME: find system way of storing / retreiving credentials and replace this shite!
+APPNAME = 'pycsync'
+
+
+# FIXME: find system way of storing / retreiving credentials and replace this crap!
 class Logins:
-    username = 'user.name'
+    username = 'joe.mangle'
     email = username + '@gmail.com'
-    password = 'XXXXXXXXX'
+    password = 'ramseystreetrocks'
 
 
 gd_client = gdata.photos.service.PhotosService()
@@ -96,13 +98,14 @@ def DoClientLogin():
     """
     gd_client.email = Logins.email
     gd_client.password = Logins.password
-    gd_client.source = 'gsaver'
+    gd_client.source = APPNAME
     gd_client.ProgrammaticLogin()
 
 
-def sync(username, prefix, limit=None, imgmax=None,
+def sync(username, limit=None, imgmax=None,
          exclusions=['Fireworks', 'Blog', 'Tech']):
     #FIXME: replace the excusions hack with a proper album selection method
+    prefix = GetCacheDir(username.text)
     try:
         album_list = gd_client.GetUserFeed(user=username, limit=limit)
         for album in reversed(album_list.entry):
@@ -113,6 +116,18 @@ def sync(username, prefix, limit=None, imgmax=None,
                 sync_album(album, prefix, imgmax)
     except socket.error:
         print 'interwebs is currently down, go make a panad'
+
+
+
+def GetFriendFeeds(username, imgmax=None, limit=None):
+    """Load the first 100 found and 
+    Delete old ones"""
+    for friend in gd_client.GetContacts(username).entry:
+        prefix = GetCacheDir(friend.title.text)
+        uri = friend.GetAlbumsUri()
+        album_list = gd_client.GetFeed(uri)
+        for album in album_list.entry:
+            sync_album(album, prefix, imgmax)
 
 
 def GetAlbumDir(album, prefix):
@@ -180,13 +195,25 @@ def GetCacheDir(username):
     return os.path.join(homedir, 'pwebc', username)
 
 
-if __name__ == '__main__':
+def main(own=True, friends=True, featured=False):
     DoClientLogin()
-# users files to sync, where to load them on the device and the scaling you want used. 
-    Thread(target=sync,
-    args=(Logins.username, GetCacheDir(Logins.username)),
-    kwargs=dict(imgmax='800u')
-    ).start()
-    Thread(target=GetFeatured,
-    kwargs=dict(imgmax='800u', limit=100)
-    ).start()
+    if own:
+        Thread(target=sync,
+        args=(Logins.username, GetCacheDir(Logins.username)),
+        kwargs=dict(imgmax='800u')
+        ).start()
+
+    if friends:
+        Thread(target=GetFriendFeeds,
+               args=(Logins.username,),
+               kwargs=dict(imgmax='800u', limit=100)
+        ).start()
+
+    if featured:
+        Thread(target=GetFeatured,
+        kwargs=dict(imgmax='800u', limit=100)
+        ).start()
+
+
+if __name__ == '__main__':
+    main(True, False, False)
